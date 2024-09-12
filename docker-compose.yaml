@@ -1,0 +1,49 @@
+services:
+  api:
+    image: lodgify/movies-api:3
+    ports:
+      - "7172:80"
+      - "7443:443"
+    environment:      
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/aspnetapp.pfx
+    volumes:
+      - ${USERPROFILE}/.aspnet/https/aspnetapp.pfx:/app/aspnetapp.pfx
+    networks:
+      - cinema_network
+    entrypoint: ["sh", "-c", "mv /app/amovies-db.json /app/movies-db.json && dotnet /app/Lodgify.Api.Challenge.dll"]
+
+  cache:
+    image: "redis"
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - cinema_network
+
+  cinemaapi:
+    image: cinemaapi
+    build:
+      context: .
+      dockerfile: ApiApplication/Dockerfile
+    ports:
+      - "7000:80"
+      - "7001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTPS_PORT=7001
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/aspnetapp.pfx
+    volumes:
+      - ${USERPROFILE}/.aspnet/https/aspnetapp.pfx:/app/aspnetapp.pfx
+    networks:
+      - cinema_network
+    depends_on:
+      - api
+      - cache
+networks:
+  cinema_network:
+    driver: bridge

@@ -1,0 +1,92 @@
+Please add the cURLs of your tests here:
+
+
+GET ALL MOVIES
+-----------------------------------------------------------------------
+curl -X 'GET' 'https://localhost:7001/api/Movies' -H 'accept: */*'
+
+GET MOVIE BY ID
+-----------------------------------------------------------------------
+curl -X 'GET' 'https://localhost:7001/api/Movies/tt0111161' -H 'accept: */*'
+
+CREATE SHOW TIME
+-----------------------------------------------------------------------
+curl -X 'POST' \
+  'https://localhost:7001/api/Showtime' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "imdbId": "tt0111161",
+  "auditoriumId": 1,
+  "sessionDate": "2024-08-31T19:18:33.526Z"
+}'
+
+GET ALL SHOW TIMES
+-----------------------------------------------------------------------
+curl -X 'GET' 'https://localhost:7001/api/Showtime' -H 'accept: */*'
+
+GET SHOW TIME BY ID
+-----------------------------------------------------------------------
+curl -X 'GET' 'https://localhost:7001/api/Showtime/2' -H 'accept: */*'
+
+RESERVE TICKET
+-----------------------------------------------------------------------
+curl -X 'POST' \
+  'https://localhost:7001/api/Ticket/reserve-seats' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "showtimeId": 2,
+  "seats": [
+    {
+      "row": 1,
+      "seatNumber": 1
+    }
+  ]
+}'
+
+RESERVE TICKET AGAIN
+-----------------------------------------------------------------------
+curl -X 'POST' \
+  'https://localhost:7001/api/Ticket/reserve-seats' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "showtimeId": 1,
+  "seats": [
+    {
+      "row": 1,
+      "seatNumber": 1
+    }
+  ]
+}'
+
+RESERVE TICKET VALIDATION FAIL (Already reserved)
+-----------------------------------------------------------------------
+curl -X 'POST' \
+  'https://localhost:7001/api/Ticket/reserve-seats' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "showtimeId": 1,
+  "seats": [
+    {
+      "row": 1,
+      "seatNumber": 1
+    }
+  ]
+}'
+
+GET TICKETS BY SHOWTIME ID
+-----------------------------------------------------------------------
+curl -X 'GET' 'https://localhost:7001/api/Ticket/by-showtime/1' -H 'accept: */*'
+
+curl -X 'GET' 'https://localhost:7001/api/Ticket/by-showtime/2' -H 'accept: */*'
+
+CONFIRM TICKET (Update ticket Guid)
+-----------------------------------------------------------------------
+curl -X 'POST' 'https://localhost:7001/api/Ticket/confirm-ticket?ticketId=940fc022-b929-43d3-b1bb-843ad6a785e5' -H 'accept: */*' -d ''
+
+CONFIRM TICKET ALREADY SOLD EXCEPTION (Update ticket Guid)
+-----------------------------------------------------------------------
+curl -X 'POST' 'https://localhost:7001/api/Ticket/confirm-ticket?ticketId=940fc022-b929-43d3-b1bb-843ad6a785e5' -H 'accept: */*' -d ''
